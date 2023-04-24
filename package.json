@@ -1,0 +1,44 @@
+{
+  "name": "advanced-giveaways",
+  "version": "0.0.1",
+  "description": "A Advance Discord Giveaway System",
+  "main": "index.js",
+  "types": "./src/types/index.d.ts",
+  "scripts": {
+    "start": "node ."
+  },
+  "keywords": [
+    "discord",
+    "discord.js", 
+    "giveaways",
+    "winner",
+    "framework",
+    "bot",
+    "discord-giveaways",
+    "discord giveaways",
+    "giveaway",
+    "interaction",
+    "button",
+    "nodejs",
+    "api",
+    "giveaways",
+    "mongoose"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TejasLamba2006/advanced-giveaways.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TejasLamba2006/advanced-giveaways/issues"
+  },
+  "homepage": "https://github.com/TejasLamba2006/advanced-giveaways",
+  "author": "TejasLamba2006",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.9.0",
+    "dotenv": "^16.0.3",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.9.0",
+    "ms": "^2.1.3"
+  }
+}
