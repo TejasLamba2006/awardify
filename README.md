@@ -10,4 +10,4 @@ npm i advanced-giveaways
 yarn add advanced-giveaways
 ```
 ### Info 
-- Package origannly by [kabirsingh2004](https://discord.gg/PcUVWApWN3) 
+- Package origanly was discord-giveaways
