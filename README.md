@@ -1,4 +1,5 @@
 # Advanced-Giveaways
+![advance giveaways](https://user-images.githubusercontent.com/73745640/234253500-43093211-dd79-4349-bc18-fdfd009ab030.png)
 
 Advance discord giveaways system with Support Slash/Message and Button support
 
