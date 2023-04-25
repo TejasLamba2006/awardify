@@ -19,7 +19,9 @@ module.exports = {
     GiveawayEnded: 'giveawayEnded',
     GiveawayMemberJoined: 'giveawayMemberJoined',
     GiveawayMemberLeft: 'giveawayMemberLeft',
-    GiveawayRerolled: 'giveawayRerolled'
+    GiveawayRerolled: 'giveawayRerolled',
+    GiveawayMemberAlreadyJoined: 'giveawayMemberAlreadyJoined',
+    GiveawayMemberTryLeft: 'giveawayMemberTryLeft',
 };
 
 /**
