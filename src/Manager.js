@@ -297,7 +297,7 @@ class GiveawaysManager extends EventEmitter {
                 content: giveaway.fillInString(giveaway.messages.giveaway),
                 embeds: [embed],
                 allowedMentions: giveaway.allowedMentions,
-                components: giveaway.buttons
+                components: giveaway.buttons 
                     ? giveaway.fillInComponents([
                           { components: [giveaway.buttons.join, giveaway.buttons.leave].filter(Boolean) }
                       ])
@@ -330,7 +330,7 @@ class GiveawaysManager extends EventEmitter {
             } else {
                 const collector = giveaway.message.createMessageComponentCollector({
                     filter: async (interaction) =>
-                        interaction.customId === giveaway.buttons.join.data.custom_id &&
+                        (interaction.customId === giveaway.buttons.join.data.custom_id || interaction.customId === giveaway.buttons.join.custom_id) &&
                         (await giveaway.checkWinnerEntry(interaction.user)),
                     componentType: Discord.ComponentType.Button
                 });
@@ -732,8 +732,8 @@ class GiveawaysManager extends EventEmitter {
             //         })
             //         .catch(() => {});
             // };
-           
-            if (giveaway.buttons.join.data.custom_id === interaction.customId) {
+
+            if (giveaway.buttons.join.data.custom_id === interaction.customId || giveaway.buttons.join.custom_id === interaction.customId) {
                
                 // If only one button is used, remove the user if he has already joined
                 if (!giveaway.buttons.leave && giveaway.entrantIds.includes(interaction.member.id)) {
@@ -749,18 +749,36 @@ class GiveawaysManager extends EventEmitter {
                     this.emit(Events.GiveawayMemberAlreadyJoined, giveaway, interaction.member, interaction, this, Events);
                     return;
                 }
+                if(giveaway.isDrop && giveaway.entrantIds.length == 0) {
+                    giveaway.entrantIds.push(interaction.member.id)
+                }
+                if (giveaway.isDrop && giveaway.entrantIds.length >= giveaway.winnerCount) {
+                    interaction.deferUpdate()
+                    await checkForDropEnd(giveaway);
+                    return;
+                }
+                // if(giveaway.isDrop){
+                //     const users = await giveaway.fetchAllEntrants().catch(() => {});
+
+                //     let validUsers = 0;
+                //     for (const user of users?.values() || []) {
+                //         if (await giveaway.checkWinnerEntry(user)) validUsers++;
+                //         if (validUsers === giveaway.winnerCount) {
+                //             await this.end(giveaway.messageId).catch(() => {});
+                //             break;
+                //         }
+                //     }
+                // }
 
                // giveaway.entrantIds.push(interaction.member.id);
 
                // if (giveaway.buttons.joinReply) await replyToInteraction(giveaway.buttons.joinReply);
 
                 this.emit(Events.GiveawayMemberJoined, giveaway, interaction.member, interaction, this, Events);
-
-                // if (giveaway.isDrop && giveaway.entrantIds.length >= giveaway.winnerCount) {
-                //     await checkForDropEnd(giveaway);
-                // }
+                 
             } else if (
                 giveaway.buttons.leave?.data.custom_id === interaction.customId &&
+                giveaway.entrantIds.includes(interaction.member.id) || giveaway.buttons.leave?.custom_id === interaction.customId &&
                 giveaway.entrantIds.includes(interaction.member.id)
             ) {
                 // const index = giveaway.entrantIds.indexOf(interaction.member.id);
