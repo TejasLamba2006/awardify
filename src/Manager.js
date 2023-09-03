@@ -94,22 +94,19 @@ class GiveawaysManager extends EventEmitter {
                 iconURL: giveaway.messages.embedFooter.iconURL
             })
             .setDescription(
-                giveaway.isDrop
-                    ? giveaway.messages.dropMessage
-                    : (giveaway.pauseOptions.isPaused
-                          ? giveaway.pauseOptions.content + '\n\n'
-                          : lastChanceEnabled
-                          ? giveaway.lastChance.content + '\n\n'
-                          : '') +
-                          giveaway.messages.inviteToParticipate +
-                          '\n' +
-                          giveaway.messages.drawing.replace(
-                              '{timestamp}',
-                              giveaway.endAt === Infinity
-                                  ? giveaway.pauseOptions.infiniteDurationText
-                                  : `<t:${Math.round(giveaway.endAt / 1000)}:R>`
-                          ) +
-                          (giveaway.hostedBy ? '\n' + giveaway.messages.hostedBy : '')
+                `
+                    ${giveaway.isDrop ? giveaway.messages.dropMessage : ''}
+                    ${giveaway.pauseOptions.isPaused ? `${giveaway.pauseOptions.content}\n\n` : ''}
+                    ${lastChanceEnabled ? `${giveaway.lastChance.content}\n\n` : ''}
+                    ${giveaway.messages.inviteToParticipate}
+                    ${giveaway.messages.drawing.replace(
+                        '{timestamp}',
+                        giveaway.endAt === Infinity
+                            ? giveaway.pauseOptions.infiniteDurationText
+                            : `<t:${Math.round(giveaway.endAt / 1000)}:R>`
+                    )}
+                    ${giveaway.hostedBy ? '\n' + giveaway.messages.hostedBy : ''}
+                `
             )
             .setThumbnail(giveaway.thumbnail)
             .setImage(giveaway.image);
@@ -134,15 +131,15 @@ class GiveawaysManager extends EventEmitter {
         };
 
         const descriptionString = (formattedWinners) =>
-            strings.winners + ' ' + formattedWinners + (giveaway.hostedBy ? '\n' + strings.hostedBy : '');
+            `${strings.winners} ${formattedWinners}${giveaway.hostedBy ? '\n' + strings.hostedBy : ''}`;
 
-        for (
-            let i = 1;
+        let i = 1;
+        while (
             descriptionString(formattedWinners).length > 4096 ||
-            strings.title.length + strings.endedAt.length + descriptionString(formattedWinners).length > 6000;
-            i++
+            strings.title.length + strings.endedAt.length + descriptionString(formattedWinners).length > 6000
         ) {
             formattedWinners = formattedWinners.slice(0, formattedWinners.lastIndexOf(', <@')) + `, ${i} more`;
+            i++;
         }
 
         return new Discord.EmbedBuilder()
@@ -297,7 +294,7 @@ class GiveawaysManager extends EventEmitter {
                 content: giveaway.fillInString(giveaway.messages.giveaway),
                 embeds: [embed],
                 allowedMentions: giveaway.allowedMentions,
-                components: giveaway.buttons 
+                components: giveaway.buttons
                     ? giveaway.fillInComponents([
                           { components: [giveaway.buttons.join, giveaway.buttons.leave].filter(Boolean) }
                       ])
@@ -330,7 +327,8 @@ class GiveawaysManager extends EventEmitter {
             } else {
                 const collector = giveaway.message.createMessageComponentCollector({
                     filter: async (interaction) =>
-                        (interaction.customId === giveaway.buttons.join.data.custom_id || interaction.customId === giveaway.buttons.join.custom_id) &&
+                        (interaction.customId === giveaway.buttons.join.data.custom_id ||
+                            interaction.customId === giveaway.buttons.join.custom_id) &&
                         (await giveaway.checkWinnerEntry(interaction.user)),
                     componentType: Discord.ComponentType.Button
                 });
@@ -716,10 +714,13 @@ class GiveawaysManager extends EventEmitter {
         });
 
         this.client.on(Discord.Events.InteractionCreate, async (interaction) => {
-            
             if (!interaction.isButton() || !interaction.guild?.available || !interaction.channel?.viewable) return;
             const giveaway = this.giveaways.find((g) => g.messageId === interaction.message.id);
-            if (!giveaway || !giveaway.buttons || giveaway.ended) return;
+
+            if (!giveaway || !giveaway.buttons || giveaway.ended) {
+                this.emit(Events.GiveawayAlreadyEnded, giveaway, interaction, this, Events);
+                return;
+            }
 
             // const replyToInteraction = async (message) => {
             //     const embed = giveaway.fillInEmbed(message.embed);
@@ -732,28 +733,34 @@ class GiveawaysManager extends EventEmitter {
             //         })
             //         .catch(() => {});
             // };
-
-            if (giveaway.buttons.join.data.custom_id === interaction.customId || giveaway.buttons.join.custom_id === interaction.customId) {
-               
+            if (
+                giveaway.buttons.join?.custom_id === interaction.customId ||
+                giveaway.buttons.join.data?.custom_id === interaction.customId
+            ) {
                 // If only one button is used, remove the user if he has already joined
                 if (!giveaway.buttons.leave && giveaway.entrantIds.includes(interaction.member.id)) {
-                    
-
-                   // if (giveaway.buttons.leaveReply) await replyToInteraction(giveaway.buttons.leaveReply);
+                    // if (giveaway.buttons.leaveReply) await replyToInteraction(giveaway.buttons.leaveReply);
 
                     this.emit(Events.GiveawayMemberTryLeft, giveaway, interaction.member, interaction, this, Events);
-                    
+
                     return;
                 }
                 if (giveaway.entrantIds.includes(interaction.member.id)) {
-                    this.emit(Events.GiveawayMemberAlreadyJoined, giveaway, interaction.member, interaction, this, Events);
+                    this.emit(
+                        Events.GiveawayMemberAlreadyJoined,
+                        giveaway,
+                        interaction.member,
+                        interaction,
+                        this,
+                        Events
+                    );
                     return;
                 }
-                if(giveaway.isDrop && giveaway.entrantIds.length == 0) {
-                    giveaway.entrantIds.push(interaction.member.id)
+                if (giveaway.isDrop && giveaway.entrantIds.length == 0) {
+                    giveaway.entrantIds.push(interaction.member.id);
                 }
                 if (giveaway.isDrop && giveaway.entrantIds.length >= giveaway.winnerCount) {
-                    interaction.deferUpdate()
+                    interaction.deferUpdate();
                     await checkForDropEnd(giveaway);
                     return;
                 }
@@ -770,25 +777,22 @@ class GiveawaysManager extends EventEmitter {
                 //     }
                 // }
 
-               // giveaway.entrantIds.push(interaction.member.id);
+                // giveaway.entrantIds.push(interaction.member.id);
 
-               // if (giveaway.buttons.joinReply) await replyToInteraction(giveaway.buttons.joinReply);
-
+                // if (giveaway.buttons.joinReply) await replyToInteraction(giveaway.buttons.joinReply);
                 this.emit(Events.GiveawayMemberJoined, giveaway, interaction.member, interaction, this, Events);
-                 
             } else if (
-                giveaway.buttons.leave?.data.custom_id === interaction.customId &&
-                giveaway.entrantIds.includes(interaction.member.id) || giveaway.buttons.leave?.custom_id === interaction.customId &&
-                giveaway.entrantIds.includes(interaction.member.id)
+                (giveaway.buttons.leave?.data.custom_id === interaction.customId &&
+                    giveaway.entrantIds.includes(interaction.member.id)) ||
+                (giveaway.buttons.leave?.custom_id === interaction.customId &&
+                    giveaway.entrantIds.includes(interaction.member.id))
             ) {
                 // const index = giveaway.entrantIds.indexOf(interaction.member.id);
                 // giveaway.entrantIds.splice(index, 1);
 
                 //if (giveaway.buttons.leaveReply) await replyToInteraction(giveaway.buttons.leaveReply);
-
                 this.emit(Events.GiveawayMemberLeft, giveaway, interaction.member, interaction, this, Events);
             }
-
             await this.editGiveaway(giveaway.messageId, giveaway.data);
         });
     }
