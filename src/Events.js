@@ -22,6 +22,7 @@ module.exports = {
     GiveawayRerolled: 'giveawayRerolled',
     GiveawayMemberAlreadyJoined: 'giveawayMemberAlreadyJoined',
     GiveawayMemberTryLeft: 'giveawayMemberTryLeft',
+    GiveawayAlreadyEnded: 'giveawayAlreadyEnded',
 };
 
 /**
