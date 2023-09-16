@@ -310,7 +310,6 @@ export interface GiveawayData<ExtraData = any> {
 }
 
 export enum Events {
-    EndedGiveawayReactionAdded = 'endedGiveawayReactionAdded',
     GiveawayDeleted = 'giveawayDeleted',
     GiveawayEnded = 'giveawayEnded',
     GiveawayMemberJoined = 'giveawayMemberJoined',

@@ -1,11 +1,13 @@
 /**
  * @typedef {Object} Events
- * @property {string} EndedGiveawayReactionAdded endedGiveawayReactionAdded
  * @property {string} GiveawayDeleted giveawayDeleted'
  * @property {string} GiveawayEnded giveawayEnded
  * @property {string} GiveawayMemberJoined giveawayMemberJoined
  * @property {string} GiveawayMemberLeft giveawayMemberLeft
  * @property {string} GiveawayRerolled giveawayRerolled
+ * @property {string} GiveawayMemberAlreadyJoined giveawayMemberAlreadyJoined
+ * @property {string} GiveawayMemberTryLeft giveawayMemberTryLeft
+ * @property {string} GiveawayAlreadyEnded giveawayAlreadyEnded
  */
 
 // JSDoc for IntelliSense purposes
@@ -14,7 +16,6 @@
  * @ignore
  */
 module.exports = {
-    EndedGiveawayReactionAdded: 'endedGiveawayReactionAdded',
     GiveawayDeleted: 'giveawayDeleted',
     GiveawayEnded: 'giveawayEnded',
     GiveawayMemberJoined: 'giveawayMemberJoined',
@@ -25,19 +26,6 @@ module.exports = {
     GiveawayAlreadyEnded: 'giveawayAlreadyEnded',
 };
 
-/**
- * Emitted when someone reacted to an ended giveaway.
- * @event GiveawaysManager#endedGiveawayReactionAdded
- * @param {Giveaway} giveaway The giveaway instance
- * @param {Discord.GuildMember} member The member who reacted to the ended giveaway
- * @param {Discord.MessageReaction} reaction The reaction object
- *
- * @example
- * // This can be used to prevent new participants when giveaways with reactions get rerolled
- * manager.on('endedGiveawayReactionAdded', (giveaway, member, reaction) => {
- *      return reaction.users.remove(member.user);
- * });
- */
 
 /**
  * Emitted when a giveaway was deleted.
@@ -120,5 +108,57 @@ module.exports = {
  *      winners.forEach((member) => {
  *          member.send('Congratulations, ' + member.user.username + ', you won: ' + giveaway.prize);
  *      });
+ * });
+ */
+
+/**
+ * Emitted when a member already joined a giveaway and the leave button exists
+ *
+ * @event GiveawaysManager#GiveawayMemberAlreadyJoined
+ * @param {Giveaway} giveaway - The giveaway instance.
+ * @param {Discord.GuildMember} member - The member who already joined the giveaway.
+ * @param {Discord.MessageReaction|Discord.ButtonInteraction} interaction - The interaction that triggered this event.
+ * @param {GiveawaysManager} manager - The GiveawaysManager instance.
+ * @param {Events} events - The Events enumeration containing event names.
+ *
+ * @example
+ * // This event can be used to handle cases where a member tries to join a giveaway multiple times.
+ * manager.on('GiveawayMemberAlreadyJoined', (giveaway, member, interaction, manager, events) => {
+ *     // Check if the member has already joined and prevent multiple entries.
+ *     if (giveaway.entrantIds.includes(member.id)) {
+ *         // Notify the user that they've already joined.
+ *         interaction.reply('You have already joined this giveaway.');
+ *         return;
+ *     }
+ *
+ *     // Add the member to the list of entrants.
+ *     giveaway.entrantIds.push(member.id);
+ *
+ *     // If needed, you can remove the member from the entrantIds using the following code:
+ *      const index = giveaway.entrantIds.indexOf(member.id);
+ *      if (index !== -1) {
+ *          giveaway.entrantIds.splice(index, 1);
+ *      }
+ *     
+ *     // Perform other necessary actions here.
+ * });
+ */
+
+/**
+ * Emitted when a member attempts join a giveaway when the leave button does not exist
+ *
+ * @event GiveawaysManager#GiveawayMemberTryLeft
+ * @param {Giveaway} giveaway - The giveaway instance.
+ * @param {Discord.GuildMember} member - The member attempting to leave the giveaway.
+ * @param {Discord.MessageReaction|Discord.ButtonInteraction} interaction - The interaction that triggered the leave attempt.
+ * @param {GiveawaysManager} manager - The GiveawaysManager instance.
+ * @param {Events} events - The Events enumeration containing event names.
+ *
+ * @example
+ * // This event can be used to handle cases where a member attempts to leave a giveaway.
+ * manager.on('GiveawayMemberTryLeft', (giveaway, member, interaction, manager, events) => {
+ * 
+ *     
+ *     // Perform other necessary actions here.
  * });
  */

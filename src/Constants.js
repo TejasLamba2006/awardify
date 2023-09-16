@@ -29,7 +29,7 @@ exports.GiveawayMessages = {
     drawing: 'Drawing: {timestamp}',
     dropMessage: 'Be the first to react with 🎉 !',
     embedFooter: '{this.winnerCount} winner(s)',
-    noWinner: 'Giveaway cancelled, no valid participations.',
+    noWinner: `Giveaway cancelled, no valid participation's.`,
     winners: 'Winner(s):',
     endedAt: 'Ended at',
     hostedBy: 'Hosted by: {this.hostedBy}'

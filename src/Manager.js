@@ -34,13 +34,10 @@ class GiveawaysManager extends EventEmitter {
     constructor(client, options, init = true) {
         super();
         if (!client?.options) throw new Error(`Client is a required option. (val=${client})`);
-        if (
-            !new Discord.IntentsBitField(client.options.intents).has(
-                Discord.IntentsBitField.Flags.GuildMessageReactions
-            )
-        ) {
-            throw new Error('Client is missing the "GuildMessageReactions" intent.');
+        if (!(client instanceof Discord.Client)) {
+            throw new Error('Client is missing the "GuildIntegrations" intent.');
         }
+        
 
         /**
          * The Discord Client
@@ -243,7 +240,10 @@ class GiveawaysManager extends EventEmitter {
             ) {
                 return reject(`"options.buttons.join" or "options.buttons.leave" is a "Link" button.`);
             }
+            if (options.isDrop && options.buttons?.leave) {
+                return reject(`"options.buttons.leave" is not supported in drop`);
 
+            }
             const giveaway = new Giveaway(this, {
                 startAt: Date.now(),
                 endAt: options.isDrop ? Infinity : Date.now() + options.duration,
@@ -311,20 +311,20 @@ class GiveawaysManager extends EventEmitter {
 
             if (!giveaway.isDrop) return;
 
-            if (!giveaway.buttons) {
-                const collector = reaction.message.createReactionCollector({
-                    filter: async (r, u) =>
-                        [r.emoji.name, r.emoji.id].filter(Boolean).includes(reaction.emoji.id ?? reaction.emoji.name) &&
-                        u.id !== this.client.user.id &&
-                        (await giveaway.checkWinnerEntry(u))
-                });
-                collector.on('collect', (r) => {
-                    if (r.count - 1 >= giveaway.winnerCount) {
-                        this.end(giveaway.messageId).catch(() => {});
-                        collector.stop();
-                    }
-                });
-            } else {
+            // if (!giveaway.buttons) {
+            //     const collector = reaction.message.createReactionCollector({
+            //         filter: async (r, u) =>
+            //             [r.emoji.name, r.emoji.id].filter(Boolean).includes(reaction.emoji.id ?? reaction.emoji.name) &&
+            //             u.id !== this.client.user.id &&
+            //             (await giveaway.checkWinnerEntry(u))
+            //     });
+            //     collector.on('collect', (r) => {
+            //         if (r.count - 1 >= giveaway.winnerCount) {
+            //             this.end(giveaway.messageId).catch(() => {});
+            //             collector.stop();
+            //         }
+            //     });
+            // } else {
                 const collector = giveaway.message.createMessageComponentCollector({
                     filter: async (interaction) =>
                         (interaction.customId === giveaway.buttons.join.data.custom_id ||
@@ -338,7 +338,7 @@ class GiveawaysManager extends EventEmitter {
                         collector.stop();
                     }
                 });
-            }
+          //  }
         });
     }
 
@@ -684,34 +684,34 @@ class GiveawaysManager extends EventEmitter {
             }
         };
 
-        this.client.on(Discord.Events.MessageReactionAdd, async (messageReaction, user) => {
-            if (user.id === this.client.user.id) return;
-            const giveaway = this.giveaways.find((g) => g.messageId === messageReaction.message.id);
-            if (!giveaway) return;
-            if (!messageReaction.message.guild?.available || !messageReaction.message.channel.viewable) return;
-            const member = await messageReaction.message.guild.members.fetch(user).catch(() => {});
-            if (!member) return;
-            const emoji = Discord.resolvePartialEmoji(giveaway.reaction);
-            if (messageReaction.emoji.name != emoji.name || messageReaction.emoji.id != emoji.id) return;
+        // this.client.on(Discord.Events.MessageReactionAdd, async (messageReaction, user) => {
+        //     if (user.id === this.client.user.id) return;
+        //     const giveaway = this.giveaways.find((g) => g.messageId === messageReaction.message.id);
+        //     if (!giveaway) return;
+        //     if (!messageReaction.message.guild?.available || !messageReaction.message.channel.viewable) return;
+        //     const member = await messageReaction.message.guild.members.fetch(user).catch(() => {});
+        //     if (!member) return;
+        //     const emoji = Discord.resolvePartialEmoji(giveaway.reaction);
+        //     if (messageReaction.emoji.name != emoji.name || messageReaction.emoji.id != emoji.id) return;
 
-            if (giveaway.ended) return this.emit(Events.EndedGiveawayReactionAdded, giveaway, member, messageReaction);
-            this.emit(Events.GiveawayMemberJoined, giveaway, member, messageReaction);
+        //     if (giveaway.ended) return this.emit(Events.EndedGiveawayReactionAdded, giveaway, member, messageReaction);
+        //     this.emit(Events.GiveawayMemberJoined, giveaway, member, messageReaction);
 
-            if (giveaway.isDrop && messageReaction.count - 1 >= giveaway.winnerCount) await checkForDropEnd(giveaway);
-        });
+        //     if (giveaway.isDrop && messageReaction.count - 1 >= giveaway.winnerCount) await checkForDropEnd(giveaway);
+        // });
 
-        this.client.on(Discord.Events.MessageReactionRemove, async (messageReaction, user) => {
-            if (user.id === this.client.user.id) return;
-            const giveaway = this.giveaways.find((g) => g.messageId === messageReaction.message.id);
-            if (!giveaway || giveaway.ended) return;
-            if (!messageReaction.message.guild?.available || !messageReaction.message.channel.viewable) return;
-            const member = await messageReaction.message.guild.members.fetch(user).catch(() => {});
-            if (!member) return;
-            const emoji = Discord.resolvePartialEmoji(giveaway.reaction);
-            if (messageReaction.emoji.name != emoji.name || messageReaction.emoji.id != emoji.id) return;
+        // this.client.on(Discord.Events.MessageReactionRemove, async (messageReaction, user) => {
+        //     if (user.id === this.client.user.id) return;
+        //     const giveaway = this.giveaways.find((g) => g.messageId === messageReaction.message.id);
+        //     if (!giveaway || giveaway.ended) return;
+        //     if (!messageReaction.message.guild?.available || !messageReaction.message.channel.viewable) return;
+        //     const member = await messageReaction.message.guild.members.fetch(user).catch(() => {});
+        //     if (!member) return;
+        //     const emoji = Discord.resolvePartialEmoji(giveaway.reaction);
+        //     if (messageReaction.emoji.name != emoji.name || messageReaction.emoji.id != emoji.id) return;
 
-            this.emit(Events.GiveawayMemberLeft, giveaway, member, messageReaction);
-        });
+        //     this.emit(Events.GiveawayMemberLeft, giveaway, member, messageReaction);
+        // });
 
         this.client.on(Discord.Events.InteractionCreate, async (interaction) => {
             if (!interaction.isButton() || !interaction.guild?.available || !interaction.channel?.viewable) return;
