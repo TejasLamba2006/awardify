@@ -1,5 +1,11 @@
 const { resolveColor } = require('discord.js');
 
+/**
+ * Validates the embed color.
+ *
+ * @param {any} embedColor - The color of the embed.
+ * @return {boolean} Whether the embed color is valid or not.
+ */
 exports.validateEmbedColor = (embedColor) => {
     try {
         embedColor = resolveColor(embedColor);
@@ -9,6 +15,13 @@ exports.validateEmbedColor = (embedColor) => {
     }
 };
 
+/**
+ * Checks if two embed objects are equal.
+ *
+ * @param {Object} embed1 - The first embed object.
+ * @param {Object} embed2 - The second embed object.
+ * @return {boolean} Returns true if the embed objects are equal, otherwise false.
+ */
 exports.embedEqual = (embed1, embed2) => {
     if (embed1.author?.name !== embed2.author?.name) return false;
     if (embed1.author?.icon_url !== embed2.author?.icon_url) return false;
@@ -29,6 +42,13 @@ exports.embedEqual = (embed1, embed2) => {
     return true;
 };
 
+/**
+ * Checks if two buttons are equal.
+ *
+ * @param {object} button1 - The first button to compare.
+ * @param {object} button2 - The second button to compare.
+ * @return {boolean} True if the buttons are equal, false otherwise.
+ */
 exports.buttonEqual = (button1, button2) => {
     if (button1.custom_Id !== button2.custom_Id) return false;
     if (button1.label !== button2.label) return false;
