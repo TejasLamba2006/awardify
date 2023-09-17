@@ -114,7 +114,7 @@ module.exports = {
 /**
  * Emitted when a member already joined a giveaway and the leave button exists
  *
- * @event GiveawaysManager#GiveawayMemberAlreadyJoined
+ * @event GiveawaysManager#giveawayMemberAlreadyJoined
  * @param {Giveaway} giveaway - The giveaway instance.
  * @param {Discord.GuildMember} member - The member who already joined the giveaway.
  * @param {Discord.MessageReaction|Discord.ButtonInteraction} interaction - The interaction that triggered this event.
@@ -147,7 +147,7 @@ module.exports = {
 /**
  * Emitted when a member attempts join a giveaway when the leave button does not exist
  *
- * @event GiveawaysManager#GiveawayMemberTryLeft
+ * @event GiveawaysManager#giveawayMemberTryLeft
  * @param {Giveaway} giveaway - The giveaway instance.
  * @param {Discord.GuildMember} member - The member attempting to leave the giveaway.
  * @param {Discord.MessageReaction|Discord.ButtonInteraction} interaction - The interaction that triggered the leave attempt.
@@ -158,6 +158,26 @@ module.exports = {
  * // This event can be used to handle cases where a member attempts to leave a giveaway.
  * manager.on('GiveawayMemberTryLeft', (giveaway, member, interaction, manager, events) => {
  * 
+ *     
+ *     // Perform other necessary actions here.
+ * });
+ */
+
+/**
+ * Emitted when a member attempts to join a giveaway that has already ended.
+ *
+ * @event GiveawaysManager#giveawayAlreadyEnded
+ * @param {Giveaway} giveaway - The giveaway instance that has already ended.
+ * @param {Discord.GuildMember} member - The member attempting to join the ended giveaway.
+ * @param {Discord.MessageReaction|Discord.ButtonInteraction} interaction - The interaction that triggered the join attempt.
+ * @param {GiveawaysManager} manager - The GiveawaysManager instance.
+ * @param {Events} events - The Events enumeration containing event names.
+ *
+ * @example
+ * // This event can be used to handle cases where a member attempts to join a giveaway that has ended.
+ * manager.on('GiveawayAlreadyEnded', (giveaway, member, interaction, manager, events) => {
+ *     // You can notify the member that the giveaway has already ended.
+ *     member.send('Sorry, this giveaway has already ended.');
  *     
  *     // Perform other necessary actions here.
  * });
