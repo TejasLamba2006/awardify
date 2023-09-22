@@ -1,6 +1,6 @@
 {
-  "name": "advanced-giveaways",
-  "version": "0.0.6",
+  "name": "awardify",
+  "version": "0.0.3",
   "description": "A Advance Discord Giveaway System",
   "main": "index.js",
   "types": "./src/types/index.d.ts",
@@ -28,12 +28,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/TejasLamba2006/advanced-giveaways.git"
+    "url": "https://github.com/TejasLamba2006/awardify.git"
   },
   "bugs": {
-    "url": "https://github.com/TejasLamba2006/advanced-giveaways/issues"
+    "url": "https://github.com/TejasLamba2006/awardify/issues"
   },
-  "homepage": "https://github.com/TejasLamba2006/advanced-giveaways",
+  "homepage": "https://github.com/TejasLamba2006/awardify",
   "author": "TejasLamba2006",
   "license": "ISC",
   "dependencies": {
