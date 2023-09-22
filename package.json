@@ -1,6 +1,6 @@
 {
   "name": "awardify",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A Advance Discord Giveaway System",
   "main": "index.js",
   "types": "./src/types/index.d.ts",
